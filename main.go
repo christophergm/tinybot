@@ -7,18 +7,39 @@ import (
 )
 
 func main() {
+	// n := ws2812.New(machine.PC24)
+
+	// Blink yellow board LED
 	led := machine.PC30
 	led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	go func() {
+		for {
+			led.Low()
+			time.Sleep(time.Millisecond * 250)
+
+			led.High()
+			time.Sleep(time.Millisecond * 250)
+		}
+	}()
 
 	// Configure the pin
-	buttonRed := machine.PC17
-	buttonRed.Configure(machine.PinConfig{Mode: machine.PinTimer})
+	buttonB := machine.PC17
+	buttonB.Configure(machine.PinConfig{Mode: machine.PinTimer})
 
-	// Set up PWM timer for ping
+	buttonR := machine.PC16
+	buttonR.Configure(machine.PinConfig{Mode: machine.PinTimer})
+
+	// Set up PWM timer
 	pwmTimer := machine.TCC0
 	pwmTimer.Configure(machine.PWMConfig{})
 
-	ch, err := pwmTimer.Channel(buttonRed)
+	chB, err := pwmTimer.Channel(buttonB)
+	if err != nil {
+		println("Failed to get PWM channel:", err)
+		return
+	}
+
+	chR, err := pwmTimer.Channel(buttonR)
 	if err != nil {
 		println("Failed to get PWM channel:", err)
 		return
@@ -27,41 +48,28 @@ func main() {
 	// Set the PWM period (frequency)
 	pwmTimer.SetPeriod(1000) // 1 kHz
 
-	// n := ws2812.New(machine.PC24)
-
-	// Blink yellow board LED
-	go func() {
-		for {
-			led.Low()
-			buttonRed.Low()
-			time.Sleep(time.Millisecond * 250)
-
-			led.High()
-			buttonRed.High()
-			time.Sleep(time.Millisecond * 250)
-		}
-	}()
-
 	// Ramp up and down the PWM duty cycle
+	max := pwmTimer.Top()
 	go func() {
 		i := uint32(0)
-		onCount := pwmTimer.Top() / uint32(30)
+		onCount := max / uint32(10)
 		direction := 1
+		pwmTimer.Set(chR, max/10)
 		for {
 			if direction == 1 {
 				i = i + onCount
 			} else {
 				i = i - onCount
 			}
-			if i >= pwmTimer.Top() {
-				i = pwmTimer.Top()
+			if i >= max {
+				i = max
 				direction = -1
 			}
 			if i <= 0 {
 				i = 0
 				direction = 1
 			}
-			pwmTimer.Set(ch, i)
+			pwmTimer.Set(chB, i)
 			time.Sleep(time.Millisecond * 25)
 		}
 	}()
