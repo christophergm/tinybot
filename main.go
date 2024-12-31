@@ -59,6 +59,7 @@ func main() {
 	max := pwmTimer.Top()
 	go func() {
 		i := uint32(0)
+		set := false
 		onCount := max / uint32(10)
 		direction := 1
 		pwmTimer.Set(chR, max/10)
@@ -78,9 +79,12 @@ func main() {
 			}
 			if buttonInput.Get() == true {
 				pwmTimer.Set(chR, 0)
+				set = false
 			} else {
-				pwmTimer.Set(chR, max)
-
+				if set == false {
+					pwmTimer.Set(chR, max)
+					set = true
+				}
 			}
 			pwmTimer.Set(chB, i)
 			time.Sleep(time.Millisecond * 25)
