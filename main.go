@@ -17,6 +17,7 @@ func main() {
 
 	// Blink yellow board LED
 	led := machine.PC30
+
 	led.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	go func() {
 		for {
@@ -35,7 +36,7 @@ func main() {
 	buttonLedR.Configure(machine.PinConfig{Mode: machine.PinTimer})
 
 	buttonInput := machine.PB13
-	buttonInput.Configure(machine.PinConfig{Mode: machine.PinInput})
+	buttonInput.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
 	// Set up PWM timer
 	pwmTimer := machine.TCC0
 	pwmTimer.Configure(machine.PWMConfig{})
@@ -59,7 +60,6 @@ func main() {
 	max := pwmTimer.Top()
 	go func() {
 		i := uint32(0)
-		set := false
 		onCount := max / uint32(10)
 		direction := 1
 		pwmTimer.Set(chR, max/10)
@@ -79,12 +79,8 @@ func main() {
 			}
 			if buttonInput.Get() == true {
 				pwmTimer.Set(chR, 0)
-				set = false
 			} else {
-				if set == false {
-					pwmTimer.Set(chR, max)
-					set = true
-				}
+				pwmTimer.Set(chR, max/10)
 			}
 			pwmTimer.Set(chB, i)
 			time.Sleep(time.Millisecond * 25)
