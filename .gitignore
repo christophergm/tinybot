@@ -26,3 +26,6 @@ go.work.sum
 
 # Documents
 *.pdf
+
+# VScode env settings
+.vscode
