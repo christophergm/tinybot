@@ -40,10 +40,15 @@ func main() {
 	neoPixel.SetColorAndPause(Yellow, pauseMilliseconds)
 	neoPixel.SetColorAndPause(Blue, pauseMilliseconds)
 
-	// Continuously set a random color every second
-	for {
-		neoPixel.SetRandomColorAndPause(pauseMilliseconds)
+	spi := peripheral.Spi{}
+	if err := spi.Configure(); err != nil {
+		for {
+			neoPixel.SetRandomColorAndPause(pauseMilliseconds)
+		}
 	}
+	spi.Start()
+
+	// Continuously set a random color every second
 
 	select {}
 }

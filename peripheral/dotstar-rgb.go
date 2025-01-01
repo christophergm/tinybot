@@ -21,7 +21,9 @@ func (d *DotStarRGB) Configure() {
 	spi.Configure(machine.SPIConfig{
 		Frequency: 4000000,      // 4 MHz, typical for APA102
 		SCK:       machine.PD09, // SCK
-		SDO:       machine.PD08, // MOSI
+		SDO:       machine.PD08,
+		SDI:       machine.PA22,
+		Mode:      0, // MOSI
 	})
 }
 
