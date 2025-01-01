@@ -12,7 +12,7 @@ type Elevator struct {
 	chB uint8
 	// Red Channel
 	chR         uint8
-	buttonInput machine.Pin
+	ButtonInput machine.Pin
 }
 
 func (e *Elevator) Configure() {
@@ -25,7 +25,7 @@ func (e *Elevator) Configure() {
 
 	buttonInput := machine.PB13
 	buttonInput.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
-	e.buttonInput = buttonInput
+	e.ButtonInput = buttonInput
 
 	// Set up PWM timer
 	e.pwmTimer = machine.TCC0
@@ -72,7 +72,7 @@ func (e *Elevator) Run() {
 			i = 0
 			direction = 1
 		}
-		if e.buttonInput.Get() == true {
+		if e.ButtonInput.Get() == true {
 			e.pwmTimer.Set(e.chR, 0)
 		} else {
 			e.pwmTimer.Set(e.chR, max/10)

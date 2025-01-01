@@ -40,21 +40,21 @@ func main() {
 	neoPixel.SetColorAndPause(Yellow, pauseMilliseconds)
 	neoPixel.SetColorAndPause(Blue, pauseMilliseconds)
 
-	// spi := peripheral.Spi{}
-	// if err := spi.Configure(); err != nil {
-	// 	for {
-	// 		neoPixel.SetRandomColorAndPause(pauseMilliseconds)
-	// 	}
-	// }
-	// spi.Start()
-
 	dotStar := peripheral.DotStarRGB{}
 	if err := dotStar.Configure(); err != nil {
 		for {
 			neoPixel.SetRandomColorAndPause(pauseMilliseconds)
 		}
 	}
-	dotStar.Start()
+	dotStar.StartSpin()
+	for {
+		if elevatorButton.ButtonInput.Get() == true {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	dotStar.Explode()
 
 	select {}
 }
