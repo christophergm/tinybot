@@ -19,6 +19,8 @@ var (
 
 func main() {
 
+	pauseMilliseconds := 100
+
 	rand.Seed(uint64(time.Now().UnixNano()))
 
 	neoPixel := peripheral.NeoPixel{}
@@ -28,20 +30,19 @@ func main() {
 	boardYellowLight.Configure()
 	boardYellowLight.StartBlink()
 
-	neoPixel.SetColorAndPause(Green, 500)
+	neoPixel.SetColorAndPause(Green, pauseMilliseconds)
 
 	elevatorButton := peripheral.Elevator{Period: 1000}
 	elevatorButton.Configure()
 	go elevatorButton.Run()
 
-	neoPixel.SetColorAndPause(Red, 500)
-	neoPixel.SetColorAndPause(Yellow, 500)
-	neoPixel.SetColorAndPause(Blue, 500)
+	neoPixel.SetColorAndPause(Red, pauseMilliseconds)
+	neoPixel.SetColorAndPause(Yellow, pauseMilliseconds)
+	neoPixel.SetColorAndPause(Blue, pauseMilliseconds)
 
 	// Continuously set a random color every second
 	for {
-		neoPixel.SetRandomColorAndPause(500)
-		time.Sleep(1 * time.Second)
+		neoPixel.SetRandomColorAndPause(pauseMilliseconds)
 	}
 
 	select {}
