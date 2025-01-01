@@ -30,8 +30,9 @@ func main() {
 
 	neoPixel.SetColorAndPause(Green, 500)
 
-	// elevatorButton := peripheral.Elevator{Period: 1000}
-	// go elevatorButton.Run()
+	elevatorButton := peripheral.Elevator{Period: 1000}
+	elevatorButton.Configure()
+	go elevatorButton.Run()
 
 	neoPixel.SetColorAndPause(Red, 500)
 	neoPixel.SetColorAndPause(Yellow, 500)
