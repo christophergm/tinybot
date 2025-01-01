@@ -21,19 +21,23 @@ func (d *NeoPixel) Configure() {
 }
 
 // SetRandomColor sets the NeoPixel to a random color
-func (d *NeoPixel) SetRandomColor() {
+func (d *NeoPixel) SetRandomColorAndPause(pauseMilliseconds int) {
 	// Generate random RGB values
-	r := uint8(rand.Intn(256))
-	g := uint8(rand.Intn(256))
-	b := uint8(rand.Intn(256))
+	r := uint8(rand.Intn(50))
+	g := uint8(rand.Intn(50))
+	b := uint8(rand.Intn(50))
 
 	// Write the color to the NeoPixel
 	d.NeoPixelDriver.WriteColors([]color.RGBA{{r, g, b, 255}})
-	time.Sleep(time.Millisecond * 500)
+	if pauseMilliseconds > 0 {
+		time.Sleep(time.Millisecond * time.Duration(pauseMilliseconds))
+	}
 }
 
-func (d *NeoPixel) SetColor(col color.RGBA) {
+func (d *NeoPixel) SetColorAndPause(col color.RGBA, pauseMilliseconds int) {
 	// Write the color to the NeoPixel
 	d.NeoPixelDriver.WriteColors([]color.RGBA{{col.R, col.G, col.B, 20}})
-	time.Sleep(time.Millisecond * 500)
+	if pauseMilliseconds > 0 {
+		time.Sleep(time.Millisecond * time.Duration(pauseMilliseconds))
+	}
 }
