@@ -1,19 +1,49 @@
 package main
 
 import (
-	"machine" // grandcentral-m4"
+	"image/color"
+	"machine"
 	"time"
-	// "tinygo.org/x/drivers/ws2812"
+
+	"golang.org/x/exp/rand"
+	// "tinygo.org/x/drivers/apa102"
+	"tinygo.org/x/drivers/ws2812"
 )
 
 func main() {
-	// n := ws2812.New(machine.PC24)
 
-	// probably best to init serial for debugging if you need it
-	machine.InitSerial()
+	rand.Seed(uint64(time.Now().UnixNano()))
 
-	// wait a half second so serial can sync
-	time.Sleep(time.Millisecond * 500)
+	// Configure the onboard NeoPixel
+	neoPixelPin := machine.PC24
+	neoPixelPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	neoPixelDriver := ws2812.NewWS2812(neoPixelPin)
+
+	// // probably best to init serial for debugging if you need it
+	//machine.InitSerial()
+
+	// Initialize SPI and LED strip driver
+	// spi := machine.SPI0 // all mosi and sck pins are pd09 and pd08
+	// spi.Configure(machine.SPIConfig{
+	// 	Frequency: 4000000,      // 4 MHz, typical for APA102
+	// 	SCK:       machine.PD09, // SCK
+	// 	SDO:       machine.PD08, // MOSI
+	// })
+	// SetRandomColor sets the NeoPixel to a random color
+
+	time.Sleep(500 * time.Millisecond)
+
+	neoPixelDriver.WriteColors([]color.RGBA{{255, 0, 0, 20}})
+
+	SetRandomColor := func(led ws2812.Device) {
+		// Generate random RGB values
+		r := uint8(rand.Intn(256))
+		g := uint8(rand.Intn(256))
+		b := uint8(rand.Intn(256))
+
+		// Write the color to the NeoPixel
+		neoPixelDriver.WriteColors([]color.RGBA{{r, g, b, 20}})
+	}
 
 	// Blink yellow board LED
 	led := machine.PC30
@@ -53,6 +83,21 @@ func main() {
 		return
 	}
 
+	// Initialize SPI and LED strip driver
+	spi := machine.SPI0
+	spi.Configure(machine.SPIConfig{
+		Frequency: 4000000,      // 4 MHz, typical for APA102
+		SCK:       machine.PD09, // SCK
+		SDO:       machine.PD08, // MOSI
+	})
+
+	//ledStrip := apa102.New(spi)
+
+	// go testSPI(ledStrip)
+
+	// numLEDs := 144 // Number of LEDs on your strip
+	// buffer := make([]color.RGBA, numLEDs)
+
 	// Set the PWM period (frequency)
 	pwmTimer.SetPeriod(1000) // 1 kHz
 
@@ -87,5 +132,10 @@ func main() {
 		}
 	}()
 
+	// Continuously set a random color every second
+	for {
+		SetRandomColor(neoPixelDriver)
+		time.Sleep(1 * time.Second)
+	}
 	select {}
 }
