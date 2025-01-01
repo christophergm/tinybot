@@ -44,11 +44,12 @@ func (d *DotStarRGB) StartSpin() {
 	var col color.RGBA
 	d.canceled = false
 	go func() {
+		tailLength := rand.Intn(40) + 1
 		for {
 
 			for i := 0; i < d.numLEDs; i++ {
 
-				if i < 20 {
+				if i < tailLength {
 					col = color.RGBA{R: uint8(i * 3), G: uint8(i / 2), B: uint8(i), A: 255}
 				} else {
 					col = color.RGBA{R: 0, G: 0, B: 0, A: 255}
