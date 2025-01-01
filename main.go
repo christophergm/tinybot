@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"golang.org/x/exp/rand"
-	// "tinygo.org/x/drivers/apa102"
+	"tinygo.org/x/drivers/apa102"
 	"tinygo.org/x/drivers/ws2812"
 )
 
@@ -31,20 +31,6 @@ func main() {
 	// })
 	// SetRandomColor sets the NeoPixel to a random color
 
-	time.Sleep(500 * time.Millisecond)
-
-	neoPixelDriver.WriteColors([]color.RGBA{{255, 0, 0, 20}})
-
-	SetRandomColor := func(led ws2812.Device) {
-		// Generate random RGB values
-		r := uint8(rand.Intn(256))
-		g := uint8(rand.Intn(256))
-		b := uint8(rand.Intn(256))
-
-		// Write the color to the NeoPixel
-		neoPixelDriver.WriteColors([]color.RGBA{{r, g, b, 20}})
-	}
-
 	// Blink yellow board LED
 	led := machine.PC30
 
@@ -58,6 +44,14 @@ func main() {
 			time.Sleep(time.Millisecond * 250)
 		}
 	}()
+
+	red := color.RGBA{255, 0, 0, 20}
+	blue := color.RGBA{0, 255, 0, 20}
+	green := color.RGBA{0, 0, 255, 20}
+	yellow := color.RGBA{255, 255, 0, 20}
+
+	SetColor(neoPixelDriver, green)
+
 	// Configure the pins
 	buttonLedB := machine.PC17
 	buttonLedB.Configure(machine.PinConfig{Mode: machine.PinTimer})
@@ -67,6 +61,7 @@ func main() {
 
 	buttonInput := machine.PB13
 	buttonInput.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
+
 	// Set up PWM timer
 	pwmTimer := machine.TCC0
 	pwmTimer.Configure(machine.PWMConfig{})
@@ -91,9 +86,10 @@ func main() {
 		SDO:       machine.PD08, // MOSI
 	})
 
-	//ledStrip := apa102.New(spi)
+	// spi.configurePin()
 
-	// go testSPI(ledStrip)
+	ledStrip := apa102.New(spi)
+	go testSPI(ledStrip)
 
 	// numLEDs := 144 // Number of LEDs on your strip
 	// buffer := make([]color.RGBA, numLEDs)
@@ -132,10 +128,26 @@ func main() {
 		}
 	}()
 
+	SetColor(neoPixelDriver, yellow)
+	SetColor(neoPixelDriver, red)
+	SetColor(neoPixelDriver, blue)
+
 	// Continuously set a random color every second
 	for {
 		SetRandomColor(neoPixelDriver)
 		time.Sleep(1 * time.Second)
 	}
+
 	select {}
+}
+
+func testSPI(ledStrip *apa102.Device) {
+	for {
+		ledStrip.WriteColors([]color.RGBA{
+			{R: 255, G: 0, B: 0, A: 255},
+			{R: 0, G: 255, B: 0, A: 255},
+			{R: 0, G: 0, B: 255, A: 255},
+		})
+		time.Sleep(500 * time.Millisecond)
+	}
 }
