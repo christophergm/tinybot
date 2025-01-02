@@ -42,15 +42,22 @@ func (d *DotStarRGB) Configure() error {
 
 func (d *DotStarRGB) StartSpin() {
 	var col color.RGBA
+	input := machine.ADC{Pin: machine.A3}
+	input.Configure(machine.ADCConfig{})
 	d.canceled = false
 	go func() {
-		tailLength := rand.Intn(40) + 1
+		tailLength := rand.Intn(100) + 1
 		for {
 
 			for i := 0; i < d.numLEDs; i++ {
 
 				if i < tailLength {
-					col = color.RGBA{R: uint8(i * 3), G: uint8(i / 2), B: uint8(i), A: 255}
+					if input.Get() > 32766 {
+						col = color.RGBA{R:100, G:100, B:100, A: 255}
+					} else {
+						col = color.RGBA{R: uint8(i * 3), G: uint8(i / 2), B: uint8(i), A: 255}
+
+					}
 				} else {
 					col = color.RGBA{R: 0, G: 0, B: 0, A: 255}
 				}
@@ -61,13 +68,21 @@ func (d *DotStarRGB) StartSpin() {
 
 			d.ledStrip.WriteColors(d.buffer)
 
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(readDelay(500))
 			d.startPos++
 			if d.canceled {
 				return
 			}
 		}
 	}()
+}
+
+func readDelay(scale int) time.Duration {
+	input := machine.ADC{Pin: machine.A0}
+	input.Configure(machine.ADCConfig{})
+	delay := input.Get()
+	percentage := (float64(delay) / 262140) * 100
+	return time.Duration((scale*int(percentage))/100) * time.Millisecond
 }
 
 func (d *DotStarRGB) Explode() {

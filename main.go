@@ -46,15 +46,23 @@ func main() {
 			neoPixel.SetRandomColorAndPause(pauseMilliseconds)
 		}
 	}
+
+
+	var sploded = false
 	dotStar.StartSpin()
 	for {
 		if elevatorButton.ButtonInput.Get() == true {
-			break
+			if sploded == false {
+				dotStar.Explode()
+				sploded = true
+			} else {
+				dotStar.StartSpin()
+				sploded = false
+			}
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	dotStar.Explode()
 
 	select {}
 }
